@@ -1,6 +1,7 @@
 package com.example.study;
 
 import com.example.study.domain.Statement;
+import com.example.study.domain.StatementData;
 import com.example.study.dto.Invoice;
 import com.example.study.dto.Play;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +19,6 @@ public class StudyApplication {
 
     public static <T> T readJson(String filepath, Class<T> valueType) {
         ObjectMapper objectMapper = new ObjectMapper();
-
         try {
             return objectMapper.readValue(new File(filepath), valueType);
         } catch (IOException exception) {
@@ -31,8 +31,10 @@ public class StudyApplication {
         Play[] plays = readJson("/Users/kimtaeheon/Documents/GitHub/study/src/main/java/com/example/study/resource/plays.json", Play[].class);
         Invoice[] invoices = readJson("/Users/kimtaeheon/Documents/GitHub/study/src/main/java/com/example/study/resource/invoices.json", Invoice[].class);
 
-        Statement statement = new Statement(invoices[0], plays);
-        System.out.println(statement.readPlainText());
+        Statement statement = new Statement(new StatementData(invoices[0], plays));
+        String plainText = statement.readPlainText();
+
+        System.out.println(plainText);
     }
 
 }

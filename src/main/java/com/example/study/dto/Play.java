@@ -1,5 +1,6 @@
 package com.example.study.dto;
 
+import com.example.study.domain.PlayType;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.Getter;
 import lombok.ToString;
@@ -14,5 +15,5 @@ public class Play {
   private String name;
 
   @JsonSetter("type")
-  private String type;
+  private PlayType type;
 }
