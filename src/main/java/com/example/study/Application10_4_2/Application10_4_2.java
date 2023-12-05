@@ -33,8 +33,22 @@ class ExperiencedChinaRating extends Rating {
     public ExperiencedChinaRating(Voyage voyage, History history) {
         super(voyage, history);
     }
-}
 
+    @Override
+    protected int captainHistoryRisk(Voyage voyage, History history) {
+        return super.captainHistoryRisk(voyage, history) - 2;
+    }
+
+    @Override
+    public int voyageAndHistoryLengthFactor(Voyage voyage, History history) {
+        int result = 0;
+        result += 3;
+        if (history.getSize() > 10) result += 1;
+        if (voyage.length > 12) result += 1;
+        if (voyage.length > 18) result -= 1;
+        return result;
+    }
+}
 
 class Rating {
     Voyage voyage;
@@ -63,11 +77,12 @@ class Rating {
     }
 
     // 선장의 항해 이력 위험 요소
-    private int captainHistoryRisk(Voyage voyage, History history) {
+    protected int captainHistoryRisk(Voyage voyage, History history) {
         int result = 1;
         if (history.getSize() < 5) result += 4;
         result += history.voyages.stream().filter(v -> v.profit < 0).count();
-        if (voyage.zone.equals("중국") && History.hasChina(history)) result -= 2; // 조건을 기반으로 인스턴스 다르게 생성
+        // if (voyage.zone.equals("중국") && History.hasChina(history)) result -= 2; // 조건을 기반으로 인스턴스 다르게 생성
+        // result의 추가적인 값 연산이 생기기 때문에 분리는 하는데 하위 클래스도 기본으로 사용해야 한다.
         return Math.max(result, 0);
     }
 
@@ -76,15 +91,19 @@ class Rating {
         int result = 2;
         if (voyage.zone.equals("중국")) result += 1;
         if (voyage.zone.equals("동인도")) result += 1;
-        if (voyage.zone.equals("중국") && History.hasChina(history)) {
-            result += 3;
-            if (history.getSize() > 10) result += 1;
-            if (voyage.length > 12) result += 1;
-            if (voyage.length > 18) result -= 1;
-        } else {
-            if (history.getSize() > 8) result += 1;
-            if (voyage.length > 14) result -= 1;
-        }
+        result = voyageAndHistoryLengthFactor(voyage, history);
+        return result;
+    }
+
+    protected int voyageAndHistoryLengthFactor(Voyage voyage, History history) {
+        int result = 0;
+        result = historyLengthFactor(history, result);
+        if (voyage.length > 14) result -= 1;
+        return result;
+    }
+
+    private static int historyLengthFactor(History history, int result) {
+        if (history.getSize() > 8) result += 1;
         return result;
     }
 }
